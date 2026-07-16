@@ -1,2 +1,1094 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plane 私有化研发效能平台规划汇报</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #667085;
+        --soft: #f4f7fb;
+        --panel: #ffffff;
+        --line: #d9e1ec;
+        --navy: #152f4f;
+        --teal: #087f8c;
+        --green: #188a58;
+        --amber: #b76e00;
+        --red: #b42318;
+        --blue: #2266c7;
+        --violet: #6941c6;
+        --shadow: 0 18px 42px rgba(23, 32, 51, 0.12);
+      }
 
-<!-- 测试 -->
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(90deg, rgba(21, 47, 79, 0.04) 1px, transparent 1px),
+          linear-gradient(180deg, rgba(21, 47, 79, 0.04) 1px, transparent 1px),
+          #f8fafc;
+        background-size: 44px 44px;
+        font-family:
+          Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial,
+          sans-serif;
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px clamp(18px, 4vw, 56px);
+        border-bottom: 1px solid rgba(217, 225, 236, 0.92);
+        background: rgba(248, 250, 252, 0.9);
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 220px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--navy), var(--teal));
+        box-shadow: 0 10px 24px rgba(8, 127, 140, 0.25);
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .nav a {
+        padding: 7px 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+      }
+
+      .nav a:hover {
+        border-color: var(--line);
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: clamp(26px, 5vw, 68px);
+        align-items: center;
+        padding: clamp(54px, 8vw, 94px) clamp(18px, 5vw, 72px) 28px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        color: var(--teal);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 24px;
+        height: 2px;
+        background: var(--teal);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 980px;
+        margin-bottom: 18px;
+        font-size: clamp(38px, 6.2vw, 76px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+        font-size: clamp(26px, 3vw, 38px);
+        line-height: 1.14;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      .lead {
+        max-width: 780px;
+        margin-bottom: 26px;
+        color: #48566d;
+        font-size: clamp(17px, 1.45vw, 21px);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        font-weight: 700;
+        box-shadow: 0 7px 18px rgba(23, 32, 51, 0.08);
+      }
+
+      .button.primary {
+        border-color: transparent;
+        background: var(--navy);
+        color: #fff;
+      }
+
+      .signal-board {
+        position: relative;
+        min-height: 430px;
+        padding: 20px;
+        border: 1px solid rgba(217, 225, 236, 0.9);
+        border-radius: 8px;
+        background:
+          linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 249, 0.94)),
+          #fff;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .signal-board::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(130deg, transparent 0 54%, rgba(8, 127, 140, 0.12) 54% 56%, transparent 56%),
+          linear-gradient(25deg, transparent 0 62%, rgba(183, 110, 0, 0.12) 62% 64%, transparent 64%);
+        pointer-events: none;
+      }
+
+      .board-head {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .pipeline {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        min-height: 236px;
+      }
+
+      .lane {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .lane-label {
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .ticket {
+        position: relative;
+        min-height: 78px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .ticket strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+      }
+
+      .ticket span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .ci-strip {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .ci-node {
+        min-height: 72px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #172033;
+        color: #fff;
+      }
+
+      .ci-node span {
+        display: block;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+      }
+
+      section {
+        padding: 58px clamp(18px, 5vw, 72px);
+      }
+
+      .section-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      .section-kicker {
+        color: var(--teal);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .section-copy {
+        max-width: 840px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 10px 26px rgba(23, 32, 51, 0.07);
+      }
+
+      .metric {
+        min-height: 154px;
+      }
+
+      .metric .num {
+        margin: 8px 0 6px;
+        color: var(--navy);
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .metric p,
+      .card p {
+        margin-bottom: 0;
+        color: var(--muted);
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        border-radius: 6px;
+        background: #edf7f8;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .dark-band {
+        background: #172033;
+        color: #fff;
+      }
+
+      .dark-band .section-kicker,
+      .dark-band h2 {
+        color: #fff;
+      }
+
+      .dark-band .section-copy {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .dark-band .card {
+        border-color: rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        box-shadow: none;
+      }
+
+      .dark-band .card p,
+      .dark-band .list li {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .list li {
+        position: relative;
+        padding-left: 20px;
+        color: var(--muted);
+      }
+
+      .list li::before {
+        content: "";
+        position: absolute;
+        top: 0.72em;
+        left: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--teal);
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(110px, 1fr));
+        gap: 10px;
+        margin-top: 28px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+
+      .flow-step {
+        min-height: 118px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--blue);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .flow-step:nth-child(2) {
+        border-top-color: var(--amber);
+      }
+
+      .flow-step:nth-child(3),
+      .flow-step:nth-child(4) {
+        border-top-color: var(--violet);
+      }
+
+      .flow-step:nth-child(5) {
+        border-top-color: var(--teal);
+      }
+
+      .flow-step:nth-child(6),
+      .flow-step:nth-child(7) {
+        border-top-color: var(--green);
+      }
+
+      .flow-step b {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .flow-step span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .matrix {
+        width: 100%;
+        margin-top: 22px;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 10px 26px rgba(23, 32, 51, 0.07);
+      }
+
+      .matrix th,
+      .matrix td {
+        padding: 14px 15px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .matrix th {
+        background: #eef4f8;
+        color: #344054;
+        font-size: 13px;
+      }
+
+      .matrix tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .status {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .status.ready {
+        background: #ecfdf3;
+        color: var(--green);
+      }
+
+      .status.partial {
+        background: #fff7e6;
+        color: var(--amber);
+      }
+
+      .status.plan {
+        background: #eff4ff;
+        color: var(--blue);
+      }
+
+      .roadmap {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 26px;
+      }
+
+      .phase {
+        position: relative;
+        min-height: 280px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .dark-band .phase h3 {
+        color: var(--ink);
+      }
+
+      .dark-band .phase .list li {
+        color: var(--muted);
+      }
+
+      .phase-num {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+        background: var(--navy);
+        color: #fff;
+        font-weight: 800;
+      }
+
+      .architecture {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 14px;
+        margin-top: 26px;
+      }
+
+      .arch-col {
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .arch-box {
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 13px;
+      }
+
+      .source-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .source {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .source strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink);
+      }
+
+      footer {
+        padding: 28px clamp(18px, 5vw, 72px) 48px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .grid.cols-4,
+        .grid.cols-3,
+        .grid.cols-2,
+        .roadmap,
+        .architecture,
+        .source-list {
+          grid-template-columns: 1fr;
+        }
+
+        .signal-board {
+          min-height: auto;
+        }
+
+        .pipeline,
+        .ci-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .nav {
+          justify-content: flex-start;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .topbar {
+          position: static;
+        }
+
+        .card,
+        .matrix,
+        .phase,
+        .signal-board {
+          box-shadow: none;
+        }
+
+        section,
+        .hero {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="返回首页">
+          <span class="brand-mark">P</span>
+          <span>Plane 研发效能平台</span>
+        </a>
+        <nav class="nav" aria-label="报告导航">
+          <a href="#status">现状</a>
+          <a href="#target">目标</a>
+          <a href="#tracking">Time Tracking</a>
+          <a href="#cicd">CI/CD</a>
+          <a href="#roadmap">路线图</a>
+          <a href="#sources">依据</a>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section class="hero" aria-labelledby="title">
+          <div>
+            <div class="eyebrow">私有化 Plane 升级规划 · 2026-07-16</div>
+            <h1 id="title">从项目协作工具，升级为研发效能平台</h1>
+            <p class="lead">
+              当前私有化 Plane 已具备事项、状态、周期、模块、视图、预估、活动记录、Webhooks、API Token
+              和容器化部署基础。下一阶段建议以 Time Tracking 复建为抓手，接入 CI/CD
+              流程，把“需求提出、开发、合并、测试、发布、复盘”的状态流转沉淀为可度量数据资产。
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="https://test-project.techgp.cn/xxx/projects/a2bcd794-9f8b-4e00-84ea-4c56d9199b8d/issues/">打开私有化项目</a>
+              <a class="button" href="#roadmap">查看实施节奏</a>
+            </div>
+          </div>
+
+          <aside class="signal-board" aria-label="研发流转示意">
+            <div class="board-head">
+              <strong>研发流转驾驶舱</strong>
+              <span>需求 · 工时 · 流水线</span>
+            </div>
+            <div class="pipeline">
+              <div class="lane">
+                <div class="lane-label">需求池</div>
+                <div class="ticket"><strong>NINE-128</strong><span>研发效能平台一期</span></div>
+                <div class="ticket"><strong>NINE-131</strong><span>Time Tracking 数据模型</span></div>
+              </div>
+              <div class="lane">
+                <div class="lane-label">开发中</div>
+                <div class="ticket"><strong>NINE-132</strong><span>Worklog API / UI</span></div>
+              </div>
+              <div class="lane">
+                <div class="lane-label">合并请求</div>
+                <div class="ticket"><strong>MR !46</strong><span>关联需求并回写状态</span></div>
+              </div>
+              <div class="lane">
+                <div class="lane-label">测试环境</div>
+                <div class="ticket"><strong>test-a1b2c3d</strong><span>部署到私有化环境</span></div>
+              </div>
+              <div class="lane">
+                <div class="lane-label">已发布</div>
+                <div class="ticket"><strong>prod-v1.4.0</strong><span>发布记录可追溯</span></div>
+              </div>
+            </div>
+            <div class="ci-strip">
+              <div class="ci-node"><strong>Build</strong><span>镜像构建</span></div>
+              <div class="ci-node"><strong>Test</strong><span>检查与回归</span></div>
+              <div class="ci-node"><strong>Deploy</strong><span>测试 / 生产</span></div>
+              <div class="ci-node"><strong>Trace</strong><span>回写事项状态</span></div>
+            </div>
+          </aside>
+        </section>
+
+        <section id="status">
+          <div class="section-inner">
+            <span class="section-kicker">01 · 当前项目基础</span>
+            <h2>已有能力足够支撑“效能平台”的第一步</h2>
+            <p class="section-copy">
+              本仓库是 Plane 1.3.1 私有化 monorepo，包含 Web/Admin/Space/Live/API、共享状态包、类型包、
+              GitLab CI 与 Docker Compose 部署。现有能力已经覆盖研发事项管理的主链路，下一阶段重点是补齐工时与交付链路的自动化关联。
+            </p>
+
+            <div class="grid cols-4" style="margin-top: 26px">
+              <article class="card metric">
+                <strong>事项流转</strong>
+                <div class="num">5</div>
+                <p>内置状态组：backlog、unstarted、started、completed、cancelled，可承载需求状态治理。</p>
+              </article>
+              <article class="card metric">
+                <strong>交付组织</strong>
+                <div class="num">3</div>
+                <p>项目、周期、模块三层组织结构，配合甘特图、看板、列表、筛选视图跟踪交付。</p>
+              </article>
+              <article class="card metric">
+                <strong>自动化基础</strong>
+                <div class="num">2</div>
+                <p>已有 API Tokens 与 Webhooks 设置入口，可作为 CI/CD 与外部系统连接面。</p>
+              </article>
+              <article class="card metric">
+                <strong>部署链路</strong>
+                <div class="num">4</div>
+                <p>GitLab CI 覆盖测试构建、测试部署、生产构建、生产部署四个阶段。</p>
+              </article>
+            </div>
+
+            <table class="matrix" aria-label="当前能力矩阵">
+              <thead>
+                <tr>
+                  <th>能力域</th>
+                  <th>当前基础</th>
+                  <th>效能平台价值</th>
+                  <th>成熟度</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>需求与任务管理</td>
+                  <td>Issues、子事项、标签、负责人、优先级、富文本、附件、评论与活动记录。</td>
+                  <td>统一研发事项入口，减少需求散落在聊天、文档、代码仓库中的情况。</td>
+                  <td><span class="status ready">可用</span></td>
+                </tr>
+                <tr>
+                  <td>状态与流程</td>
+                  <td>项目状态支持创建、更新、排序、默认状态；看板支持按状态分组。</td>
+                  <td>承载从需求池到已发布的统一状态机，形成跨团队进度口径。</td>
+                  <td><span class="status ready">可用</span></td>
+                </tr>
+                <tr>
+                  <td>计划与范围</td>
+                  <td>Cycles、Modules、Views、Gantt、Analytics 目录完整。</td>
+                  <td>按迭代、模块、版本聚合需求，支持燃尽、进度、范围变更复盘。</td>
+                  <td><span class="status ready">可用</span></td>
+                </tr>
+                <tr>
+                  <td>预估与工时</td>
+                  <td>已有 Estimate 模型，类型层出现 TIME；活动类型包含 WORKLOG；导出模型包含 issue_worklogs。</td>
+                  <td>具备复建 Time Tracking 的代码线索，但仍需补齐产品入口、API、权限与报表。</td>
+                  <td><span class="status partial">待复建</span></td>
+                </tr>
+                <tr>
+                  <td>系统集成</td>
+                  <td>已有 Webhooks、API Tokens、GitHub/GitLab OAuth/集成相关代码与部署环境变量。</td>
+                  <td>可接入 GitLab/GitHub/Jenkins 等流水线事件，实现状态自动回写。</td>
+                  <td><span class="status partial">可扩展</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="target" class="dark-band">
+          <div class="section-inner">
+            <span class="section-kicker">02 · 平台定位</span>
+            <h2>让研发过程从“看得见进度”升级为“算得清效率”</h2>
+            <p class="section-copy">
+              平台目标不是替代代码仓库或流水线系统，而是成为研发事项的事实中心：需求在 Plane 中创建和拆解，
+              代码与流水线事件回写到需求，工时和状态变化沉淀为度量指标，最终服务排期、交付预测、质量复盘和管理看板。
+            </p>
+
+            <div class="architecture">
+              <div class="arch-col">
+                <h3>Plane 协作层</h3>
+                <div class="arch-box">需求事项、状态流转、周期模块、预估点、评论附件、负责人、权限</div>
+                <div class="arch-box">Time Tracking：登记、修改、汇总、导出、审计</div>
+              </div>
+              <div class="arch-col">
+                <h3>集成事件层</h3>
+                <div class="arch-box">GitLab / GitHub：commit、branch、MR/PR、review、merge</div>
+                <div class="arch-box">CI/CD：pipeline、job、artifact、deployment、rollback</div>
+              </div>
+              <div class="arch-col">
+                <h3>效能度量层</h3>
+                <div class="arch-box">需求交付周期、开发耗时、测试等待、部署频率、失败率</div>
+                <div class="arch-box">个人 / 团队 / 项目 / 版本多维报表</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tracking">
+          <div class="section-inner">
+            <span class="section-kicker">03 · Time Tracking 复建</span>
+            <h2>从“预估点”补齐到“实际投入”</h2>
+            <p class="section-copy">
+              付费版 Time Tracking 的核心价值可抽象为三件事：给事项记录实际工时、按人员/项目/周期汇总工时、把预估与实际偏差用于复盘。
+              本项目已有估算系统与 WORKLOG 活动类型痕迹，建议优先复建工作日志闭环，再扩展计时器和报表。
+            </p>
+
+            <div class="grid cols-3" style="margin-top: 26px">
+              <article class="card">
+                <h3>1. 数据模型</h3>
+                <p>新增或恢复 Worklog：事项、人员、日期、耗时、说明、来源、创建人、更新时间。保留审计字段，支持修改记录追踪。</p>
+                <div class="tag-row">
+                  <span class="tag">issue_id</span>
+                  <span class="tag">duration_minutes</span>
+                  <span class="tag">work_date</span>
+                </div>
+              </article>
+              <article class="card">
+                <h3>2. 产品入口</h3>
+                <p>在事项详情、列表字段、工作台和个人中心加入工时录入与汇总；支持手动登记、快速补录、按天查看。</p>
+                <div class="tag-row">
+                  <span class="tag">事项详情</span>
+                  <span class="tag">我的工时</span>
+                  <span class="tag">团队汇总</span>
+                </div>
+              </article>
+              <article class="card">
+                <h3>3. 报表分析</h3>
+                <p>按项目、周期、模块、人员、状态组聚合预估与实际投入，输出计划偏差、投入结构和交付瓶颈。</p>
+                <div class="tag-row">
+                  <span class="tag">预估偏差</span>
+                  <span class="tag">投入分布</span>
+                  <span class="tag">导出</span>
+                </div>
+              </article>
+            </div>
+
+            <table class="matrix" aria-label="Time Tracking 建设清单">
+              <thead>
+                <tr>
+                  <th>建设项</th>
+                  <th>一期范围</th>
+                  <th>二期增强</th>
+                  <th>验收指标</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>工时登记</td>
+                  <td>按事项手动登记、编辑、删除、活动记录留痕。</td>
+                  <td>开始/暂停计时器、批量补录、移动端适配。</td>
+                  <td>研发人员可在 30 秒内完成一次补录。</td>
+                </tr>
+                <tr>
+                  <td>权限治理</td>
+                  <td>本人可维护本人记录，项目管理员可查看与校正。</td>
+                  <td>审批、锁定周期、跨项目统计权限。</td>
+                  <td>工时数据具备可追责的审计链。</td>
+                </tr>
+                <tr>
+                  <td>汇总报表</td>
+                  <td>事项、成员、周期、项目维度汇总。</td>
+                  <td>趋势图、异常检测、导出到数据仓库。</td>
+                  <td>每个迭代可输出预估/实际偏差。</td>
+                </tr>
+                <tr>
+                  <td>现有模型复用</td>
+                  <td>复用 Estimate TIME 类型、Issue Activity、Exporter、MobX store 模式。</td>
+                  <td>统一研发效能指标服务。</td>
+                  <td>不破坏现有 points/categories 估算系统。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="cicd">
+          <div class="section-inner">
+            <span class="section-kicker">04 · CI/CD 接入</span>
+            <h2>让需求状态跟着代码和流水线自动流转</h2>
+            <p class="section-copy">
+              当前 `.gitlab-ci.yml` 已有 dev 分支测试环境构建部署、prod-v 语义化标签生产部署；`nine-project/docker-compose.yml`
+              使用镜像 Tag 驱动私有化环境更新。建议在此基础上增加“需求号识别、事件接收、状态回写、部署记录关联”四个能力。
+            </p>
+
+            <div class="flow" aria-label="需求状态流转">
+              <div class="flow-step"><b>需求池</b><span>产品/研发创建事项，确认范围与优先级。</span></div>
+              <div class="flow-step"><b>待开发</b><span>排入周期或模块，补齐验收标准与预估。</span></div>
+              <div class="flow-step"><b>开发中</b><span>分支或 Commit 关联事项号后自动进入。</span></div>
+              <div class="flow-step"><b>待合并</b><span>MR/PR 创建后回写链接、评审人和检查状态。</span></div>
+              <div class="flow-step"><b>测试中</b><span>测试环境部署成功后自动进入测试态。</span></div>
+              <div class="flow-step"><b>待发布</b><span>验收通过，等待生产发布窗口。</span></div>
+              <div class="flow-step"><b>已完成</b><span>生产部署成功并关联版本号后关闭。</span></div>
+            </div>
+
+            <div class="grid cols-2" style="margin-top: 26px">
+              <article class="card">
+                <h3>事件接入方式</h3>
+                <ul class="list">
+                  <li>GitLab/GitHub Webhook 推送 commit、merge request、pipeline、deployment 事件。</li>
+                  <li>通过事项编号规则识别关联需求，例如 NINE-123 或项目自定义前缀。</li>
+                  <li>CI Job 在构建和部署完成后调用 Plane API，写入环境、版本、Commit SHA 与结果。</li>
+                  <li>失败事件只追加活动和告警，不自动关闭事项，避免误流转。</li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>状态回写策略</h3>
+                <ul class="list">
+                  <li>分支创建或首个 Commit：待开发 → 开发中。</li>
+                  <li>MR/PR 创建：开发中 → 待合并，并写入评审链接。</li>
+                  <li>测试环境部署成功：待合并/开发中 → 测试中。</li>
+                  <li>生产部署成功：待发布 → 已完成，并关联发布版本。</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="roadmap" class="dark-band">
+          <div class="section-inner">
+            <span class="section-kicker">05 · 实施路线</span>
+            <h2>建议按四个阶段推进，先闭环再做深度分析</h2>
+            <p class="section-copy">
+              先让研发人员愿意在一个地方更新需求、登记工时、查看流水线状态；再逐步沉淀管理指标。这样风险低，且每个阶段都有可独立验收的价值。
+            </p>
+
+            <div class="roadmap">
+              <article class="phase">
+                <span class="phase-num">1</span>
+                <h3>基线梳理与流程固化</h3>
+                <ul class="list">
+                  <li>确定需求状态机、事项编号规则、权限模型。</li>
+                  <li>梳理现有 Estimate / Activity / Exporter 数据结构。</li>
+                  <li>输出 Time Tracking 接口与页面设计。</li>
+                </ul>
+              </article>
+              <article class="phase">
+                <span class="phase-num">2</span>
+                <h3>Time Tracking 一期</h3>
+                <ul class="list">
+                  <li>实现 Worklog API、迁移、权限、活动记录。</li>
+                  <li>事项详情和个人工时入口上线。</li>
+                  <li>完成项目/周期/人员维度汇总。</li>
+                </ul>
+              </article>
+              <article class="phase">
+                <span class="phase-num">3</span>
+                <h3>CI/CD 事件接入</h3>
+                <ul class="list">
+                  <li>接收 GitLab/GitHub/Jenkins 流水线事件。</li>
+                  <li>回写 MR、Commit、部署版本和环境结果。</li>
+                  <li>支持状态自动推进与异常告警。</li>
+                </ul>
+              </article>
+              <article class="phase">
+                <span class="phase-num">4</span>
+                <h3>效能报表与治理</h3>
+                <ul class="list">
+                  <li>交付周期、部署频率、失败率、返工率看板。</li>
+                  <li>预估/实际偏差分析和迭代复盘模板。</li>
+                  <li>导出与数据仓库接口预留。</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="metrics">
+          <div class="section-inner">
+            <span class="section-kicker">06 · 预期收益</span>
+            <h2>用统一数据回答研发管理中的关键问题</h2>
+            <div class="grid cols-3" style="margin-top: 26px">
+              <article class="card">
+                <h3>交付可追溯</h3>
+                <p>每个需求可以追溯到分支、Commit、MR、流水线、部署环境、版本和工时记录。</p>
+              </article>
+              <article class="card">
+                <h3>排期更可靠</h3>
+                <p>预估与实际工时持续对比，沉淀团队历史速度，降低拍脑袋排期。</p>
+              </article>
+              <article class="card">
+                <h3>瓶颈可定位</h3>
+                <p>区分开发耗时、评审等待、测试等待、发布等待，定位交付周期中的真实堵点。</p>
+              </article>
+              <article class="card">
+                <h3>质量可复盘</h3>
+                <p>把返工、回滚、失败流水线与需求关联，建立版本级质量复盘依据。</p>
+              </article>
+              <article class="card">
+                <h3>管理少打扰</h3>
+                <p>通过自动回写减少人工周报和状态询问，让团队把时间留给研发本身。</p>
+              </article>
+              <article class="card">
+                <h3>平台可演进</h3>
+                <p>以 Plane 为统一入口，后续可扩展代码评审、测试管理、发布审批和知识库联动。</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="sources">
+          <div class="section-inner">
+            <span class="section-kicker">07 · 依据与参考</span>
+            <h2>材料依据</h2>
+            <p class="section-copy">
+              本报告结合当前仓库文件与 Plane 官方公开资料整理。私有化环境地址用于汇报跳转，未在报告中暴露登录凭据或敏感配置值。
+            </p>
+            <div class="source-list">
+              <a class="source" href="https://docs.plane.so/" target="_blank" rel="noreferrer">
+                <strong>Plane 官方文档</strong>
+                Plane 核心概念、项目管理、部署与集成能力参考。
+              </a>
+              <a class="source" href="https://docs.plane.so/core-concepts/issues/time-tracking" target="_blank" rel="noreferrer">
+                <strong>Plane Time Tracking 文档</strong>
+                用于对标工时记录、工作日志和汇总能力。
+              </a>
+              <div class="source">
+                <strong>本地仓库：package.json</strong>
+                Plane 1.3.1 monorepo；pnpm、turbo、OxLint、TypeScript 检查脚本。
+              </div>
+              <div class="source">
+                <strong>本地仓库：.gitlab-ci.yml / nine-project/docker-compose.yml</strong>
+                测试与生产构建部署链路、镜像 Tag、API/Web/Worker/DB/Redis/MQ/MinIO/Proxy 服务组成。
+              </div>
+              <div class="source">
+                <strong>本地仓库：packages/types / apps/api</strong>
+                状态组、Estimate TIME、Issue Activity WORKLOG、issue_worklogs 导出线索。
+              </div>
+              <a class="source" href="https://test-project.techgp.cn/xxx/projects/a2bcd794-9f8b-4e00-84ea-4c56d9199b8d/issues/" target="_blank" rel="noreferrer">
+                <strong>私有化 Plane 项目入口</strong>
+                当前需求事项列表与后续效能平台试点空间。
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="section-inner">
+          <strong>建议下一步：</strong>
+          以一个真实项目作为试点，先固化事项编号和状态机，再开发 Time Tracking 一期并接入 GitLab 流水线事件。
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
